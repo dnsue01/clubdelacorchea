@@ -382,6 +382,10 @@ function initMobileMenu() {
 const activeStickers = [];
 
 function initDraggableStickers() {
+  const stickersLayer = document.createElement("div");
+  stickersLayer.className = "stickers-layer";
+  document.body.appendChild(stickersLayer);
+
   const stickersData = [
     { type: 'text', content: 'bumbum no tan duro', class: 'yellow-sticker', top: '8%', left: '3%' },
     { type: 'image', content: 'assets/corchea-mascota.jpg', class: 'round-sticker', top: '16%', left: '82%' },
@@ -420,7 +424,7 @@ function initDraggableStickers() {
     sticker.style.top = data.top;
     sticker.style.left = data.left;
 
-    document.body.appendChild(sticker);
+    stickersLayer.appendChild(sticker);
     
     // Track sticker state for drifting physics
     activeStickers.push({
@@ -450,9 +454,17 @@ function initDraggableStickers() {
   window.addEventListener("load", recalcAndClampStickers);
 }
 
+function getStickersBoundaryHeight() {
+  const layer = document.querySelector(".stickers-layer");
+  if (layer) {
+    return Math.max(layer.offsetHeight, window.innerHeight);
+  }
+  return Math.max(document.body.offsetHeight, window.innerHeight);
+}
+
 function recalcAndClampStickers() {
   const wWidth = document.documentElement.clientWidth;
-  const wHeight = Math.max(document.body.scrollHeight, window.innerHeight);
+  const wHeight = getStickersBoundaryHeight();
 
   activeStickers.forEach(s => {
     s.width = s.element.offsetWidth;
@@ -474,7 +486,7 @@ function recalcAndClampStickers() {
 
 function updateStickersPhysics() {
   const wWidth = document.documentElement.clientWidth;
-  const wHeight = Math.max(document.body.scrollHeight, window.innerHeight);
+  const wHeight = getStickersBoundaryHeight();
 
   activeStickers.forEach(s => {
     if (s.isDragging) {
@@ -595,7 +607,7 @@ function makeDraggable(element) {
     dragVy = Math.max(-maxVel, Math.min(maxVel, dragVy));
 
     const wWidth = document.documentElement.clientWidth;
-    const wHeight = Math.max(document.body.scrollHeight, window.innerHeight);
+    const wHeight = getStickersBoundaryHeight();
     const sWidth = (stickerState && stickerState.width) || element.offsetWidth;
     const sHeight = (stickerState && stickerState.height) || element.offsetHeight;
 
